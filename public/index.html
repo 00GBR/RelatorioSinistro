@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gerador de Relatório de Sinistro - Sompo Seguros</title>
+    <style>
+      :root {
+        --cor-primaria: #c8102e;
+        --cor-secundaria: #f2f2f2;
+        --cor-texto: #333;
+        --cor-borda: #ccc;
+      }
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 20px;
+        color: var(--cor-texto);
+      }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      header {
+        text-align: center;
+        margin-bottom: 30px;
+        border-bottom: 1px solid var(--cor-secundaria);
+        padding-bottom: 20px;
+      }
+      header img {
+        max-width: 200px;
+      }
+      header h1 {
+        color: var(--cor-primaria);
+        font-size: 24px;
+        margin: 10px 0 0 0;
+      }
+      form fieldset {
+        border: 1px solid var(--cor-borda);
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 25px;
+      }
+      form legend {
+        font-size: 18px;
+        font-weight: bold;
+        color: var(--cor-primaria);
+        padding: 0 10px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+       /* Novo grid para 3 colunas */
+      .form-grid-triple {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+      label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      input[type="text"],
+      input[type="date"],
+      input[type="time"],
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--cor-borda);
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 14px;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+      .dynamic-section {
+        border: 1px dashed var(--cor-borda);
+        padding: 15px;
+        margin-top: 15px;
+        border-radius: 5px;
+        position: relative;
+      }
+      .btn {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+      }
+      .btn-add {
+        background-color: #28a745;
+        color: white;
+        width: 100%;
+        margin-top: 10px;
+      }
+      .btn-remove {
+        background-color: var(--cor-primaria);
+        color: white;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
+      .submit-button {
+        width: 100%;
+        background-color: var(--cor-primaria);
+        color: #fff;
+        font-size: 18px;
+        padding: 15px;
+        transition: background-color 0.3s ease;
+      }
+      .submit-button:hover {
+        background-color: #a10d24;
+      }
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        flex-direction: column;
+      }
+      .loader {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid var(--cor-primaria);
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1.5s linear infinite;
+      }
+      .loading-text {
+        color: #fff;
+        font-size: 20px;
+        margin-top: 20px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loading-overlay" id="loading-overlay">
+      <div class="loader"></div>
+      <p class="loading-text">Gerando Relatório, por favor aguarde...</p>
+    </div>
+
+    <div class="container">
+      <header>
+        <img src="/imagens/logoSompoSeguros.jpeg" alt="Logo Sompo Seguros" />
+        <h1>Bem-vindo à Sompo Seguros</h1>
+      </header>
+
+      <form
+        id="report-form"
+        action="/gerar-relatorio"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <fieldset>
+          <legend>1. Dados Gerais</legend>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="numeroSinistro">Nº do Sinistro:</label
+              ><input
+                type="text"
+                id="numeroSinistro"
+                name="numeroSinistro"
+              />
+            </div>
+            <div class="form-group">
+              <label for="numeroApolice">Nº da Apólice:</label
+              ><input
+                type="text"
+                id="numeroApolice"
+                name="numeroApolice"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="nomeSegurado"
+              >Nome do Segurado (Responsável Principal):</label
+            ><input
+              type="text"
+              id="nomeSegurado"
+              name="nomeSegurado"
+            />
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="dataOcorrencia">Data da Ocorrência:</label
+              ><input
+                type="date"
+                id="dataOcorrencia"
+                name="dataOcorrencia"
+              />
+            </div>
+            <div class="form-group">
+              <label for="horaOcorrencia">Hora da Ocorrência:</label
+              ><input
+                type="time"
+                id="horaOcorrencia"
+                name="horaOcorrencia"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="localOcorrencia">Local da Ocorrência:</label
+            ><input
+              type="text"
+              id="localOcorrencia"
+              name="localOcorrencia"
+            />
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>2. Estrutura do Relatório</legend>
+          <div class="form-group">
+            <label>Sumário:</label><textarea name="sumario"></textarea
+            ><label>Imagens (até 6):</label
+            ><input type="file" name="imagensSumario" multiple />
+          </div>
+          <div class="form-group">
+            <label>Objetivo:</label><textarea name="objetivo"></textarea
+            ><label>Imagens (até 6):</label
+            ><input type="file" name="imagensObjetivo" multiple />
+          </div>
+          <div class="form-group">
+            <label>Agradecimentos:</label
+            ><textarea name="agradecimentos"></textarea
+            ><label>Imagens (até 6):</label
+            ><input type="file" name="imagensAgradecimentos" multiple />
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>3. Detalhes da Operação</legend>
+          <div class="form-group">
+            <label>Fluxo da Operação de Transporte:</label>
+            <textarea name="textoFluxoTransporte"></textarea>
+            <label>Imagens (até 6):</label>
+            <input type="file" name="imagensFluxoTransporte" multiple />
+          </div>
+          <div id="operations-container">
+            <div class="dynamic-section">
+              <h4>Operação 1</h4>
+              <div class="form-group">
+                <label>Nome da Operação/CD/Transportadora:</label
+                ><input type="text" name="operationName[]" />
+              </div>
+              <div class="form-group">
+                <label>Descrição da Operação:</label
+                ><textarea name="operationDescription[]"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Imagens da Operação (até 6):</label
+                ><input type="file" name="operationImages[0]" multiple />
+              </div>
+            </div>
+          </div>
+          <button type="button" id="add-operation-btn" class="btn btn-add">
+            Adicionar Operação +
+          </button>
+        </fieldset>
+
+        <fieldset>
+          <legend>4. Análises Detalhadas</legend>
+          <div id="analysis-container">
+            <div class="dynamic-section">
+              <h4>Análise 1</h4>
+              <div class="form-group">
+                <label>Texto da Análise:</label
+                ><textarea name="textoAnalise[]"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Imagens da Análise (até 6):</label
+                ><input type="file" name="imagensAnalise[0]" multiple />
+              </div>
+            </div>
+          </div>
+          <button type="button" id="add-analysis-btn" class="btn btn-add">
+            Adicionar Análise +
+          </button>
+        </fieldset>
+
+        <fieldset>
+          <legend>5. Inspeções</legend>
+          <div class="form-group">
+            <label>Inspeção de Carga e Análise de Inconsistências:</label
+            ><textarea name="inspecaoCarga"></textarea
+            ><label>Imagens (até 6):</label
+            ><input type="file" name="imagensInspecaoCarga" multiple />
+          </div>
+          <div class="form-group">
+            <label>Inspeção de Entrega na Concessionária:</label
+            ><textarea name="inspecaoEntrega"></textarea
+            ><label>Imagens (até 6):</label
+            ><input type="file" name="imagensInspecaoEntrega" multiple />
+          </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>6. Conclusão e Sugestões</legend>
+            <div class="form-group">
+                <label>Texto da Conclusão:</label>
+                <textarea name="conclusao"></textarea>
+                <label>Imagens da Conclusão (até 6):</label>
+                <input type="file" name="imagensConclusao" multiple />
+            </div>
+            <hr>
+            <div id="sugestoes-container">
+                <div class="dynamic-section">
+                    <h4>Sugestão de Ação 1</h4>
+                    <div class="form-group">
+                        <label>Descrição da Sugestão:</label>
+                        <textarea name="sugestoes[]"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Imagens da Sugestão (até 6):</label>
+                        <input type="file" name="imagensSugestao[0]" multiple>
+                    </div>
+                </div>
+            </div>
+            <button type="button" id="add-sugestao-btn" class="btn btn-add">Adicionar Sugestão +</button>
+        </fieldset>
+
+        <fieldset>
+          <legend>7. Validação e Encerramento</legend>
+           <div class="form-grid">
+            <div class="form-group">
+              <label for="funcaoPrincipal">Função do Responsável Principal:</label>
+              <input type="text" id="funcaoPrincipal" name="funcaoPrincipal" />
+            </div>
+            <div class="form-group">
+              <label for="empresaPrincipal">Empresa do Responsável Principal:</label>
+              <input type="text" id="empresaPrincipal" name="empresaPrincipal" />
+            </div>
+          </div>
+          <hr />
+           <div id="outras-pessoas-container"></div>
+          <button
+            type="button"
+            id="add-pessoa-btn"
+            class="btn btn-add"
+            style="background-color: #17a2b8; width: auto"
+          >
+            + Adicionar Outro Responsável
+          </button>
+          <hr style="margin-top: 20px" />
+           <div class="form-group">
+            <label for="localRelatorio">Local de Emissão do Relatório:</label>
+            <input
+              type="text"
+              id="localRelatorio"
+              name="localRelatorio"
+              placeholder="Ex: Guarulhos"
+              value="Guarulhos"
+            />
+          </div>
+          <div class="form-group">
+            <label for="dataRelatorio">Data de Emissão:</label>
+            <input type="date" id="dataRelatorio" name="dataRelatorio" />
+          </div>
+        </fieldset>
+
+        <button type="submit" class="btn submit-button">
+          Gerar Relatório em PDF
+        </button>
+      </form>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // ... (código para Análises, Operações e Sugestões continua o mesmo) ...
+
+        // Lógica para Análises Dinâmicas
+        const addAnalysisBtn = document.getElementById("add-analysis-btn");
+        const analysisContainer = document.getElementById("analysis-container");
+        let analysisIndex = 1;
+
+        addAnalysisBtn.addEventListener("click", () => {
+          const newAnalysisSection = document.createElement("div");
+          newAnalysisSection.className = "dynamic-section";
+          newAnalysisSection.innerHTML = `
+                                <button type="button" class="btn btn-remove">Remover</button>
+                                <h4>Análise ${analysisIndex + 1}</h4>
+                                <div class="form-group"><label>Texto da Análise:</label><textarea name="textoAnalise[]"></textarea></div>
+                                <div class="form-group"><label>Imagens da Análise (até 6):</label><input type="file" name="imagensAnalise[${analysisIndex}]" multiple></div>
+                            `;
+          analysisContainer.appendChild(newAnalysisSection);
+          analysisIndex++;
+          newAnalysisSection
+            .querySelector(".btn-remove")
+            .addEventListener("click", function () {
+              this.parentElement.remove();
+            });
+        });
+
+        // Lógica para Operações Dinâmicas
+        const addOperationBtn = document.getElementById("add-operation-btn");
+        const operationsContainer = document.getElementById(
+          "operations-container"
+        );
+        let operationIndex = 1;
+
+        addOperationBtn.addEventListener("click", () => {
+          const newOperationSection = document.createElement("div");
+          newOperationSection.className = "dynamic-section";
+          newOperationSection.innerHTML = `
+                                <button type="button" class="btn btn-remove">Remover</button>
+                                <h4>Operação ${operationIndex + 1}</h4>
+                                <div class="form-group"><label>Nome da Operação/CD/Transportadora:</label><input type="text" name="operationName[]"></div>
+                                <div class="form-group"><label>Descrição da Operação:</label><textarea name="operationDescription[]"></textarea></div>
+                                <div class="form-group"><label>Imagens da Operação (até 6):</label><input type="file" name="operationImages[${operationIndex}]" multiple></div>
+                            `;
+          operationsContainer.appendChild(newOperationSection);
+          operationIndex++;
+          newOperationSection
+            .querySelector(".btn-remove")
+            .addEventListener("click", function () {
+              this.parentElement.remove();
+            });
+        });
+
+        // --- ALTERAÇÃO AQUI: LÓGICA PARA RESPONSÁVEIS DINÂMICOS ---
+        const addPessoaBtn = document.getElementById("add-pessoa-btn");
+        const outrasPessoasContainer = document.getElementById(
+          "outras-pessoas-container"
+        );
+
+        addPessoaBtn.addEventListener("click", () => {
+          const newPessoaSection = document.createElement("div");
+          newPessoaSection.className = "dynamic-section";
+          // Template atualizado para incluir o campo "Empresa"
+          newPessoaSection.innerHTML = `
+            <button type="button" class="btn btn-remove">Remover</button>
+            <h4>Outro Responsável</h4>
+            <div class="form-grid-triple">
+                <div class="form-group"><label>Nome:</label><input type="text" name="outrasPessoasNomes[]"></div>
+                <div class="form-group"><label>Função:</label><input type="text" name="outrasPessoasFuncoes[]"></div>
+                <div class="form-group"><label>Empresa:</label><input type="text" name="outrasPessoasEmpresas[]"></div>
+            </div>
+          `;
+          outrasPessoasContainer.appendChild(newPessoaSection);
+          newPessoaSection
+            .querySelector(".btn-remove")
+            .addEventListener("click", function () {
+              this.parentElement.remove();
+            });
+        });
+
+        // Lógica para Sugestões Dinâmicas
+        const addSugestaoBtn = document.getElementById("add-sugestao-btn");
+        const sugestoesContainer = document.getElementById("sugestoes-container");
+        let sugestaoIndex = 1;
+
+        addSugestaoBtn.addEventListener("click", () => {
+            const newSugestaoSection = document.createElement("div");
+            newSugestaoSection.className = "dynamic-section";
+            newSugestaoSection.innerHTML = `
+                <button type="button" class="btn btn-remove">Remover</button>
+                <h4>Sugestão de Ação ${sugestaoIndex + 1}</h4>
+                <div class="form-group">
+                    <label>Descrição da Sugestão:</label>
+                    <textarea name="sugestoes[]"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Imagens da Sugestão (até 6):</label>
+                    <input type="file" name="imagensSugestao[${sugestaoIndex}]" multiple>
+                </div>
+            `;
+            sugestoesContainer.appendChild(newSugestaoSection);
+            sugestaoIndex++; 
+            
+            newSugestaoSection.querySelector('.btn-remove').addEventListener('click', function() {
+                this.parentElement.remove();
+            });
+        });
+
+        // Lógica para preencher data atual
+        document.getElementById("dataRelatorio").valueAsDate = new Date();
+
+        // Lógica do formulário e loading
+        const form = document.getElementById("report-form");
+        const loadingOverlay = document.getElementById("loading-overlay");
+        form.addEventListener("submit", () => {
+          if (form.checkValidity()) {
+            loadingOverlay.style.display = "flex";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
