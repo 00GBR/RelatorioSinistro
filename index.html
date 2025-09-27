@@ -60,7 +60,7 @@
         grid-template-columns: 1fr 1fr;
         gap: 20px;
       }
-       /* Novo grid para 3 colunas */
+      /* Novo grid para 3 colunas */
       .form-grid-triple {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -175,7 +175,7 @@
 
       <form
         id="report-form"
-        action="/gerar-relatorio"
+        action="https://relatoriosinistrobackend.onrender.com/gerar-relatorio"
         method="POST"
         enctype="multipart/form-data"
       >
@@ -184,55 +184,31 @@
           <div class="form-grid">
             <div class="form-group">
               <label for="numeroSinistro">Nº do Sinistro:</label
-              ><input
-                type="text"
-                id="numeroSinistro"
-                name="numeroSinistro"
-              />
+              ><input type="text" id="numeroSinistro" name="numeroSinistro" />
             </div>
             <div class="form-group">
               <label for="numeroApolice">Nº da Apólice:</label
-              ><input
-                type="text"
-                id="numeroApolice"
-                name="numeroApolice"
-              />
+              ><input type="text" id="numeroApolice" name="numeroApolice" />
             </div>
           </div>
           <div class="form-group">
             <label for="nomeSegurado"
               >Nome do Segurado (Responsável Principal):</label
-            ><input
-              type="text"
-              id="nomeSegurado"
-              name="nomeSegurado"
-            />
+            ><input type="text" id="nomeSegurado" name="nomeSegurado" />
           </div>
           <div class="form-grid">
             <div class="form-group">
               <label for="dataOcorrencia">Data da Ocorrência:</label
-              ><input
-                type="date"
-                id="dataOcorrencia"
-                name="dataOcorrencia"
-              />
+              ><input type="date" id="dataOcorrencia" name="dataOcorrencia" />
             </div>
             <div class="form-group">
               <label for="horaOcorrencia">Hora da Ocorrência:</label
-              ><input
-                type="time"
-                id="horaOcorrencia"
-                name="horaOcorrencia"
-              />
+              ><input type="time" id="horaOcorrencia" name="horaOcorrencia" />
             </div>
           </div>
           <div class="form-group">
             <label for="localOcorrencia">Local da Ocorrência:</label
-            ><input
-              type="text"
-              id="localOcorrencia"
-              name="localOcorrencia"
-            />
+            ><input type="text" id="localOcorrencia" name="localOcorrencia" />
           </div>
         </fieldset>
 
@@ -323,44 +299,54 @@
         </fieldset>
 
         <fieldset>
-            <legend>6. Conclusão e Sugestões</legend>
-            <div class="form-group">
-                <label>Texto da Conclusão:</label>
-                <textarea name="conclusao"></textarea>
-                <label>Imagens da Conclusão (até 6):</label>
-                <input type="file" name="imagensConclusao" multiple />
+          <legend>6. Conclusão e Sugestões</legend>
+          <div class="form-group">
+            <label>Texto da Conclusão:</label>
+            <textarea name="conclusao"></textarea>
+            <label>Imagens da Conclusão (até 6):</label>
+            <input type="file" name="imagensConclusao" multiple />
+          </div>
+          <hr />
+          <div id="sugestoes-container">
+            <div class="dynamic-section">
+              <h4>Sugestão de Ação 1</h4>
+              <div class="form-group">
+                <label>Descrição da Sugestão:</label>
+                <textarea name="sugestoes[]"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Imagens da Sugestão (até 6):</label>
+                <input type="file" name="imagensSugestao[0]" multiple />
+              </div>
             </div>
-            <hr>
-            <div id="sugestoes-container">
-                <div class="dynamic-section">
-                    <h4>Sugestão de Ação 1</h4>
-                    <div class="form-group">
-                        <label>Descrição da Sugestão:</label>
-                        <textarea name="sugestoes[]"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Imagens da Sugestão (até 6):</label>
-                        <input type="file" name="imagensSugestao[0]" multiple>
-                    </div>
-                </div>
-            </div>
-            <button type="button" id="add-sugestao-btn" class="btn btn-add">Adicionar Sugestão +</button>
+          </div>
+          <button type="button" id="add-sugestao-btn" class="btn btn-add">
+            Adicionar Sugestão +
+          </button>
         </fieldset>
 
         <fieldset>
           <legend>7. Validação e Encerramento</legend>
-           <div class="form-grid">
+          <div class="form-grid">
             <div class="form-group">
-              <label for="funcaoPrincipal">Função do Responsável Principal:</label>
+              <label for="funcaoPrincipal"
+                >Função do Responsável Principal:</label
+              >
               <input type="text" id="funcaoPrincipal" name="funcaoPrincipal" />
             </div>
             <div class="form-group">
-              <label for="empresaPrincipal">Empresa do Responsável Principal:</label>
-              <input type="text" id="empresaPrincipal" name="empresaPrincipal" />
+              <label for="empresaPrincipal"
+                >Empresa do Responsável Principal:</label
+              >
+              <input
+                type="text"
+                id="empresaPrincipal"
+                name="empresaPrincipal"
+              />
             </div>
           </div>
           <hr />
-           <div id="outras-pessoas-container"></div>
+          <div id="outras-pessoas-container"></div>
           <button
             type="button"
             id="add-pessoa-btn"
@@ -370,7 +356,7 @@
             + Adicionar Outro Responsável
           </button>
           <hr style="margin-top: 20px" />
-           <div class="form-group">
+          <div class="form-group">
             <label for="localRelatorio">Local de Emissão do Relatório:</label>
             <input
               type="text"
@@ -474,13 +460,15 @@
 
         // Lógica para Sugestões Dinâmicas
         const addSugestaoBtn = document.getElementById("add-sugestao-btn");
-        const sugestoesContainer = document.getElementById("sugestoes-container");
+        const sugestoesContainer = document.getElementById(
+          "sugestoes-container"
+        );
         let sugestaoIndex = 1;
 
         addSugestaoBtn.addEventListener("click", () => {
-            const newSugestaoSection = document.createElement("div");
-            newSugestaoSection.className = "dynamic-section";
-            newSugestaoSection.innerHTML = `
+          const newSugestaoSection = document.createElement("div");
+          newSugestaoSection.className = "dynamic-section";
+          newSugestaoSection.innerHTML = `
                 <button type="button" class="btn btn-remove">Remover</button>
                 <h4>Sugestão de Ação ${sugestaoIndex + 1}</h4>
                 <div class="form-group">
@@ -492,11 +480,13 @@
                     <input type="file" name="imagensSugestao[${sugestaoIndex}]" multiple>
                 </div>
             `;
-            sugestoesContainer.appendChild(newSugestaoSection);
-            sugestaoIndex++; 
-            
-            newSugestaoSection.querySelector('.btn-remove').addEventListener('click', function() {
-                this.parentElement.remove();
+          sugestoesContainer.appendChild(newSugestaoSection);
+          sugestaoIndex++;
+
+          newSugestaoSection
+            .querySelector(".btn-remove")
+            .addEventListener("click", function () {
+              this.parentElement.remove();
             });
         });
 
